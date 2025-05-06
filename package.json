@@ -1,0 +1,12 @@
+{
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "npx tsc --outDir dist",
+    "build:watch": "npx tsc -w --outDir dist",
+    "dev": "npm run build:watch & node --watch ./dist/index.js"
+  },
+  "dependencies": {
+    "typescript": "^5.8.3"
+  }
+}
