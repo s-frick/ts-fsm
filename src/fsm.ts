@@ -1,11 +1,19 @@
-type State = number | number[];
+type State = number;
+type StateWithName = {
+  state: State;
+  name: string;
+};
+type StateDefinition = StateWithName | StateWithName[];
+export function state(state: State, name: string): StateWithName {
+  return { state, name };
+}
 
 type Transition = {
   from: State;
   to: State;
 };
 
-function createState(state: State): number {
+function createState(state: StateDefinition | State): number {
   if (
     state === null ||
     state === undefined ||
@@ -15,21 +23,25 @@ function createState(state: State): number {
   if (Array.isArray(state)) {
     let s = 0;
     for (let i = 0; i < state.length; i++) {
-      s = s | state[i];
+      s = s | state[i].state;
     }
     return s;
   }
-  return state;
+  return getState(state);
+}
+
+function getState(state: StateWithName | State): State {
+  return typeof state === "number" ? state : state.state;
 }
 
 type Event = number;
 type FSM = {
-  matches: (s: State) => boolean;
-  send: (e: Event) => void;
+  matches: (s: StateDefinition | State) => boolean;
+  send: (e: Transition) => void;
 };
 type FSMDefinition = {
-  initial: State;
-  states: State[];
+  initial: StateDefinition;
+  states: StateDefinition[];
   transitions: Transition[];
 };
 export function createFSM({
@@ -51,14 +63,19 @@ export function createFSM({
   }
   console.log(`]`);
 
-  function matches(s: State) {
+  const trans: Transition[] = [];
+  while (transitions.length > 0) {
+    const transition = transitions.pop()!;
+  }
+
+  function matches(s: StateDefinition | State) {
     const mask = createState(s);
     console.log(`State: ${currentState.toString(2).padStart(8, "0")}`);
     console.log(` mask: ${mask.toString(2).padStart(8, "0")}`);
     return (currentState & mask) === mask;
   }
 
-  function send(e: Event) {}
+  function send(e: Transition) {}
 
   return {
     matches,
